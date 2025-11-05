@@ -22,6 +22,7 @@ def load_worldbank_fallback(indicator='NY.GDP.PCAP.CD',
     df['Year'] = df['Year'].astype(int)
     df = df.pivot(index='Year', columns='country', values='value').sort_index()
     df.reset_index(inplace=True)
+    print(df.columns)
     df.columns.name = None
     return df
 
