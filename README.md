@@ -1,52 +1,155 @@
+# 🌍 Wealth of Nations – Python Project  
+**Master in Data Science for Economics and Health – Università degli Studi di Milano**
 
-## Troubleshooting & Data Loading Notes
+Final project for the Python module.  
+This project explores how key socioeconomic indicators (GDP, Life Expectancy, Health Expenditure, Fertility, CO₂ Emissions, etc.) evolve across major world economies using World Bank data.  
+A Streamlit web dashboard was developed as a **bonus feature (+3 points)**.
 
-**Context.** Initially, I attempted to fetch World Bank data via the Python package `wbdata`.  
-However, repeated calls resulted in `JSONDecodeError` and invalid responses for some queries.
+---
 
-**Symptom.**
+## 📁 Project Structure
 
-**Cause (likely).** The World Bank endpoint occasionally returns a non-JSON response for certain
-queries/parameters, which breaks `wbdata`’s JSON parsing.
+wealth_of_nations/
+├── analysis/
+│ ├── 01_preliminary/ # Early analysis and drafts
+│ └── 02_final/ # Final scripts and app
+│ ├── _data/ # Processed datasets (CSV)
+│ ├── _plots/ # Generated figures (PNG)
+│ ├── app_dashboard.py # Streamlit dashboard (bonus)
+│ ├── data_integration.py # Data loading and merging
+│ ├── data_preparation.py # Cleaning, reshaping, z-scoring
+│ ├── plot_correlation.py # Correlation heatmap
+│ └── plot_timeseries.py # Time series comparison
+├── src/
+│ ├── data_loader.py # API and CSV loaders
+│ ├── plot_stats.py # Shared plotting utilities
+│ └── init.py
+├── data/ # Raw or external datasets (optional)
+├── reports/ # Output charts for documentation
+├── requirements.txt
+└── README.md
 
-**Solution (fallback).** I implemented a direct REST call using `requests.get()` to the official
-World Bank API (e.g. `/v2/country/{DE;IT;US}/indicator/{NY.GDP.PCAP.CD}` with query parameters
-for `date`, `format=json`, `per_page`), then converted the resulting list into a clean
-pandas DataFrame and reshaped it (Year as rows, countries as columns).  
-This approach has been stable and reproducible.
 
-**Indicator example used.** `NY.GDP.PCAP.CD` (GDP per capita, current US$).  
-**Countries used in examples.** `DE`, `IT`, `US`.  
-**Years.** 2000–2023.
+---
 
-**Why I kept it this way.** The fallback is explicit, transparent, and independent of the higher-level
-wrapper. It also makes error handling and debugging straightforward. The code is in `src/data_loader.py`
-(function `load_worldbank_fallback`).
+## 🧠 Concept & Data
 
-# Data acquisition
+Data were sourced from the **World Bank Open Data** API (`wbgapi`) and corresponding bulk CSV exports for reproducibility.  
+Indicators were selected to represent both **economic** and **demographic** dimensions.
 
-Data were sourced from the official World Bank bulk CSV exports (identical indicators to the API).
-Direct API access (wbgapi) initially failed due to rate limiting (HTTP 429) during large-scale pulls.
-For reproducibility and stability, indicators were downloaded once as CSV and processed locally.
+**Indicators**
+- GDP per capita (NY.GDP.PCAP.CD)  
+- Life expectancy (SP.DYN.LE00.IN)  
+- Health expenditure per capita (SH.XPD.CHEX.PC.CD)  
+- Child mortality (SH.DYN.MORT)  
+- Fertility rate (SP.DYN.TFRT.IN)  
+- CO₂ emissions per capita (EN.ATM.CO2E.PC)  
+- Urban population (% of total) (SP.URB.TOTL.IN.ZS)
 
-# Indicators & scope
+**Countries (example subset)**  
+DEU, ITA, USA, JPN, CHN, IND, BRA, NGA  
+**Years**: 2000–2023
 
-Countries (example subset): DEU, ITA, USA, JPN, CHN, IND, BRA, NGA
-Indicators: GDP per capita (NY.GDP.PCAP.CD), Life expectancy (SP.DYN.LE00.IN), Health expenditure per capita (SH.XPD.CHEX.PC.CD), Child mortality (SH.DYN.MORT), Fertility rate (SP.DYN.TFRT.IN), CO₂ per capita (EN.ATM.CO2E.PC), Urban population (% total) (SP.URB.TOTL.IN.ZS).
-Time window used in the analysis: 2000–2023.
+---
 
-# Known issues & fixes
+## ⚙️ Installation
 
-Attempting to fetch 8×7 indicators via API triggered repeated HTTP 429 responses.
-Mitigation: switched to bulk CSV download, unified long-format, pivoted to features per (country, year), and created a z-scored feature set for correlation analysis.
+```bash
+# 1. Clone repository
+git clone https://github.com/<your-username>/wealth_of_nations.git
+cd wealth_of_nations
 
-# Correlation Heatmap 
-The correlation heatmap shows how strongly each socioeconomic indicator is associated with others across countries and years.
-Strong positive values (red) indicate that both variables increase together (e.g., GDP per capita ↔ Life Expectancy), while strong negative values (blue) suggest inverse relationships (e.g., Fertility Rate ↔ GDP per capita).
-Near-zero correlations imply weak or no linear relationship.
+# 2. Create & activate virtual environment
+python -m venv venv
+.\venv\Scripts\activate
 
-# Web Application (Bonus Section)
-A lightweight interactive dashboard was developed using Streamlit.
-Users can select countries and indicators to visualize time series trends and explore correlations.
-This provides an intuitive interface for exploring economic and demographic relationships across nations.
+# 3. Install dependencies
+pip install -r requirements.txt
 
+-----------------------------------------------------------------------------------------------------------------------------------------------------------
+
+## Analysis Overview
+
+**Data Acquisition**
+
+Primary access via wbgapi (World Bank API).
+
+Fallback implemented with requests for stability (src/data_loader.py).
+
+Data reshaped into panel format (year × country × indicator).
+
+**Data Preparation**
+
+Cleaning, merging, and z-score normalization across indicators.
+
+Stored in _data/features_country_year_zscored.csv.
+
+**Correlation Heatmap**
+
+Heatmap visualizes cross-indicator relationships.
+
+Red → positive correlation (e.g., GDP ↔ Life Expectancy)
+
+Blue → negative correlation (e.g., GDP ↔ Fertility Rate)
+
+White → weak or no correlation.
+
+**Time Series Comparison**
+
+Line plots comparing temporal trends between countries (e.g., DEU vs CHN).
+
+Saved in _plots/timeseries_DEU_CHN.png.
+
+## Web Dashboard (Bonus)
+
+A lightweight interactive Streamlit dashboard provides real-time visualization.
+
+Run locally: streamlit run analysis/02_final/app_dashboard.py
+
+**Features:**
+
+Select countries and indicators dynamically.
+
+Display time-series charts and correlation comparisons.
+
+Enables intuitive exploration of economic and demographic trends.
+
+## Troubleshooting & Stability Notes
+
+Context.
+The World Bank API (wbgapi) occasionally triggers JSONDecodeError or HTTP 429 (rate limits) for large queries.
+
+Solution.
+A custom fallback function (load_worldbank_fallback()) was implemented using direct REST calls with requests.get().
+This ensures stability and reproducibility during large-scale pulls.
+
+Implementation.
+Located in src/data_loader.py, the fallback converts JSON responses into clean pandas DataFrames, reshapes them (year × country), and saves them locally as CSV.
+
+Evaluation Criteria Checklist
+Criterion	Implemented	Evidence
+1. GitHub Usage	->	.gitignore, structured commits, detailed README
+2. Project Organization	->	Modular structure (src/, analysis/), clear functions, docstrings
+3. Input/Output	->	API + CSV fallback, consistent loading/saving
+4. Data Manipulation	->	Pandas cleaning, merging, reshaping, z-scoring
+5. Scientific Computing	->	Correlation analysis (Pearson), numerical aggregation
+6. Visualization	->	Matplotlib & Seaborn (heatmap, time series)
+7. BONUS – Web Application	->	Streamlit dashboard with user interaction
+
+## References
+
+World Bank Open Data
+
+wbgapi Python package
+
+Matplotlib Documentation
+
+Streamlit Documentation
+
+## personal Details
+
+Author: Philipp Neglein
+Course: Data Science for Economics and Health (Python Laboratory)
+University: Unviersita degli studi di Milano
+Date: November 2025
+Repository: [github.com/philipp-neglein/wealth_of_nations](https://github.com/philipp-neglein/wealth_of_nations)
