@@ -1,4 +1,4 @@
-# 🌍 Wealth of Nations – Python Project  
+# Wealth of Nations – Python Project  
 **Master in Data Science for Economics and Health – Università degli Studi di Milano**
 
 Final project for the Python module.  
@@ -7,7 +7,7 @@ A Streamlit web dashboard was developed as a **bonus feature (+3 points)**.
 
 ---
 
-## 📁 Project Structure
+## Project Structure
 
 wealth_of_nations/
 ├── analysis/
@@ -32,7 +32,7 @@ wealth_of_nations/
 
 ---
 
-## 🧠 Concept & Data
+## Concept & Data
 
 Data were sourced from the **World Bank Open Data** API (`wbgapi`) and corresponding bulk CSV exports for reproducibility.  
 Indicators were selected to represent both **economic** and **demographic** dimensions.
@@ -52,7 +52,7 @@ DEU, ITA, USA, JPN, CHN, IND, BRA, NGA
 
 ---
 
-## ⚙️ Installation
+## Installation
 
 ```bash
 # 1. Clone repository
